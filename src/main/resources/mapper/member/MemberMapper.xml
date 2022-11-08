@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.react.api.mapper.member.MemberMapper">
+
+    <resultMap id="memberMap" type="com.react.api.domain.member.Member">
+        <id property="userId" column="user_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="userPw" column="user_pw"/>
+        <result property="userName" column="user_name"/>
+        <result property="job" column="job"/>
+        <result property="useYn" column="use_yn"/>
+        <result property="regUserId" column="reg_user_id"/>
+        <result property="regDate" column="reg_date"/>
+        <result property="updUserId" column="upd_user_id"/>
+        <result property="updDate" column="upd_date"/>
+        <collection property="authList" resultMap="authMap"/>
+    </resultMap>
+
+    <resultMap id="authMap" type="com.react.api.domain.member.MemberAuth">
+        <result property="userId" column="user_id"/>
+        <result property="auth" column="auth"/>
+    </resultMap>
+
+    <select id="memberList" resultType="com.react.api.domain.member.Member">
+        select user_id
+             , user_pw
+             , user_name
+             , job
+             , use_yn
+             , reg_user_id
+             , reg_date
+             , upd_user_id
+             , upd_date
+          from study.tb_member
+         order by user_name
+    </select>
+
+    <select id="memberRead" resultMap="memberMap">
+        select a.user_id
+             , a.user_pw
+             , a.user_name
+             , a.job
+             , a.use_yn
+             , a.reg_user_id
+             , a.reg_date
+             , a.upd_user_id
+             , a.upd_date
+             , b.auth
+          from study.tb_member a
+          left outer join study.tb_member_auth b
+            on a.user_id = b.user_id
+         where a.user_id = #{userId}
+    </select>
+
+    <insert id="memberRegister">
+        insert into study.tb_member (
+            user_id
+          , user_pw
+          , user_name
+          , job
+          , use_yn
+          , reg_user_id
+          , upd_user_id
+        ) values (
+            #{userId}
+          , #{userPw}
+          , #{userName}
+          , #{job}
+          , #{useYn}
+          , #{regUserId}
+          , #{updUserId}
+        )
+    </insert>
+
+    <insert id="memberAuthRegister">
+        insert into study.tb_member_auth (
+            user_id
+          , auth
+          , reg_user_id
+          , upd_user_id
+        ) values (
+            #{userId}
+          , #{auth}
+          , #{regUserId}
+          , #{updUserId}
+        )
+    </insert>
+
+    <update id="memberModify">
+        update study.tb_member
+           set user_name = #{userName}
+             , job = #{job}
+             , use_yn = #{useYn}
+         where user_id = #{userId}
+    </update>
+
+    <delete id="memberRemove">
+        delete from study.tb_member
+         where user_id = #{userId}
+    </delete>
+
+    <delete id="memberAuthRemove">
+        delete from study.tb_member_auth
+         where user_id = #{userId}
+    </delete>
+
+</mapper>
